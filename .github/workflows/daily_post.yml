@@ -56,36 +56,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          echo "Restoring .env configuration..."
-          cat << 'EOF' > .env
-          LINKEDIN_CLIENT_ID=${{ secrets.LINKEDIN_CLIENT_ID }}
-          LINKEDIN_CLIENT_SECRET=${{ secrets.LINKEDIN_CLIENT_SECRET }}
-          LINKEDIN_REDIRECT_URI=http://localhost:8080/callback
-          LINKEDIN_TOKEN_FILE=token.json
-
-          LLM_PROVIDER=gemini
-          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL=${{ secrets.GEMINI_MODEL || 'gemini-2.5-flash' }}
-
-          NEWS_SOURCE=rss
-          AUTO_POST=true
-
-          TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
-
-          DATABASE_PATH=posted.db
-          LOG_FILE=bot.log
-          LOG_LEVEL=INFO
-          EOF
-
-          echo "Restoring token.json for LinkedIn OAuth..."
-          if [ -n "${{ secrets.LINKEDIN_TOKEN_JSON }}" ]; then
-            echo '${{ secrets.LINKEDIN_TOKEN_JSON }}' > token.json
-            echo "token.json successfully restored."
-          else
-            echo "ERROR: LINKEDIN_TOKEN_JSON secret is empty or missing!"
-            exit 1
-          fi
+          python scripts/restore_secrets.py
 
       - name: Randomized Human-Mimic Delay
         if: github.event_name != 'workflow_dispatch' || inputs.skip_delay != true
