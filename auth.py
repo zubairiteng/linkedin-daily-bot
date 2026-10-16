@@ -107,7 +107,18 @@ def exchange_code_for_token(code: str) -> dict:
 
     response = requests.post(token_url, data=payload, headers=headers, timeout=15)
     if response.status_code != 200:
-        raise RuntimeError(f"Token exchange failed ({response.status_code}): {response.text}")
+        err_msg = f"Token exchange failed ({response.status_code}): {response.text}"
+        if response.status_code == 401 and "invalid_client" in response.text:
+            err_msg += (
+                "\n\n--> CAUSE: 'invalid_client / Client authentication failed' means LinkedIn rejected the LINKEDIN_CLIENT_SECRET.\n"
+                "--> FIX:\n"
+                "    1. Open https://www.linkedin.com/developers/apps\n"
+                "    2. Click on your App (Client ID: " + CLIENT_ID + ")\n"
+                "    3. Go to the 'Auth' tab -> 'Application credentials'\n"
+                "    4. Click the copy icon next to 'Primary Client Secret'\n"
+                "    5. Paste it into .env as LINKEDIN_CLIENT_SECRET=<copied_secret>\n"
+            )
+        raise RuntimeError(err_msg)
 
     return response.json()
 
