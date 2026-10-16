@@ -1,0 +1,32 @@
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Environment and Secrets (STRICTLY PRIVATE)
+.env
+.env.*
+!.env.example
+token.json
+
+# Local Database & Logs (STRICTLY PRIVATE)
+*.db
+*.sqlite3
+posted.db
+bot.log
+*.log
+cron.log
+
+# Python cache & build
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
