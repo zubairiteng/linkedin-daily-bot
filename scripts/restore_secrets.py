@@ -35,7 +35,7 @@ def main():
     client_id = os.environ.get("LINKEDIN_CLIENT_ID", "").strip()
     client_secret = os.environ.get("LINKEDIN_CLIENT_SECRET", "").strip()
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash").strip()
+    gemini_model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
     telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
     telegram_chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 

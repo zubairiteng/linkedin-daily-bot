@@ -93,7 +93,7 @@ class OpenAIProvider(LLMProvider):
 class GeminiProvider(LLMProvider):
     """Google Gemini API client using the official google-genai SDK."""
 
-    def __init__(self, api_key: str, model_name: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: str, model_name: str = "gemini-3.5-flash-lite"):
         if not api_key:
             raise ValueError("Gemini API key is required but missing (set GEMINI_API_KEY in .env).")
         # Accept any valid key format (including AQ. and AIzaSy) without alteration or prefix checks
