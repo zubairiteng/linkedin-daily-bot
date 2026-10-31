@@ -61,18 +61,16 @@ jobs:
       - name: Randomized Human-Mimic Delay
         if: github.event_name != 'workflow_dispatch' || inputs.skip_delay != true
         env:
-          # Up to 18,000s (5 hours) by default to stay safely within GitHub Actions 6-hour job ceiling
-          # Triggers between 8:00 AM and 1:00 PM PKT. Can be customized via repository variable.
-          RANDOM_DELAY_MAX_SECONDS: ${{ vars.RANDOM_DELAY_MAX_SECONDS || '18000' }}
+          # Up to 300s (5 minutes) so it introduces realistic jitter without burning runner minutes
+          RANDOM_DELAY_MAX_SECONDS: ${{ vars.RANDOM_DELAY_MAX_SECONDS || '300' }}
         run: |
           python -c "
           import os, random, time
-          max_sec = int(os.getenv('RANDOM_DELAY_MAX_SECONDS', '18000'))
-          sleep_sec = random.randint(0, max_sec)
-          hours = sleep_sec // 3600
-          mins = (sleep_sec % 3600) // 60
+          max_sec = int(os.getenv('RANDOM_DELAY_MAX_SECONDS', '300'))
+          sleep_sec = random.randint(30, max_sec)
+          mins = sleep_sec // 60
           secs = sleep_sec % 60
-          print(f'[Human-Mimic Delay] Sleeping for {hours}h {mins}m {secs}s ({sleep_sec} seconds) before posting...')
+          print(f'[Human-Mimic Delay] Sleeping for {mins}m {secs}s ({sleep_sec} seconds) before posting...')
           time.sleep(sleep_sec)
           print('[Human-Mimic Delay] Delay complete! Starting bot run now.')
           "
