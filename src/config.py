@@ -23,31 +23,31 @@ class TopicConfig:
     search_keywords: str
 
 
-# The four configured topics to rotate
+# The four configured high-engagement AI & Tech topics to rotate
 TOPICS: Dict[str, TopicConfig] = {
-    "ai_ml": TopicConfig(
-        id="ai_ml",
-        name="Machine Learning & AI Updates",
-        rss_query='"artificial intelligence" OR "machine learning" when:1d',
-        search_keywords="artificial intelligence machine learning LLM",
+    "genai_llm": TopicConfig(
+        id="genai_llm",
+        name="Generative AI & LLMs",
+        rss_query='("Generative AI" OR "Large Language Model" OR LLM OR "prompt engineering" OR "RAG") when:1d',
+        search_keywords="Generative AI LLM OpenAI Anthropic Claude Gemini RAG",
     ),
-    "elon_musk": TopicConfig(
-        id="elon_musk",
-        name="Elon Musk Activities",
-        rss_query='"Elon Musk" AND (Tesla OR SpaceX OR xAI OR Neuralink) when:1d',
-        search_keywords="Elon Musk Tesla SpaceX xAI Neuralink",
+    "ai_coding": TopicConfig(
+        id="ai_coding",
+        name="AI Coding & Developer Tools",
+        rss_query='("AI coding" OR "Python AI" OR "AI developer" OR "coding assistant" OR "Cursor AI") when:1d',
+        search_keywords="Python AI software engineering coding GitHub Copilot agents",
     ),
-    "bill_gates": TopicConfig(
-        id="bill_gates",
-        name="Bill Gates Activities",
-        rss_query='"Bill Gates" when:1d',
-        search_keywords="Bill Gates Breakthrough Energy Gates Foundation",
+    "ai_industry_models": TopicConfig(
+        id="ai_industry_models",
+        name="Latest AI Model Breakthroughs",
+        rss_query='(OpenAI OR "Google Gemini" OR "Anthropic Claude" OR "DeepSeek" OR "Meta AI") when:1d',
+        search_keywords="OpenAI Gemini Claude DeepSeek AI model release benchmark",
     ),
-    "openai_ceo": TopicConfig(
-        id="openai_ceo",
-        name="Sam Altman & OpenAI News",
-        rss_query='("Sam Altman" OR "OpenAI") when:1d',
-        search_keywords="Sam Altman OpenAI ChatGPT",
+    "tech_careers_skills": TopicConfig(
+        id="tech_careers_skills",
+        name="AI Skills & Software Engineering Careers",
+        rss_query='("AI skills" OR "future of work" OR "software developer jobs" OR "tech hiring") when:1d',
+        search_keywords="AI skills software jobs tech hiring developer future career",
     ),
 }
 

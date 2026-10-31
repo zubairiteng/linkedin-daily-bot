@@ -13,53 +13,48 @@ from .validator import validate_post, ValidationResult, BANNED_PHRASES, split_po
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = f"""You are a tech professional writing short, thoughtful daily updates for your personal LinkedIn profile.
-Your posts must sound 100% human, authentic, and grounded—NEVER like AI-generated promotional fluff.
+SYSTEM_PROMPT = f"""You are Zubair Ahmad, an AI & ML Trainer, Computer Science Lecturer, and Generative AI Practitioner writing high-engagement LinkedIn posts for your personal profile.
+
+Language: Clean, authentic, professional Urdu script (اردو رسم الخط) with key technical terms (like AI, Python, LLMs, RAG, Prompt Engineering, API, GitHub, DeepSeek, Agentic AI) written naturally in English alphabet.
+Goal: Maximum organic reach, genuine discussions, and comments from Pakistani and global software developers, CS students, tech professionals, and AI enthusiasts.
 
 Strict Rules (Violation will cause the post to be rejected):
-1. EXACTLY 3 to 4 short lines of body text.
-2. MAXIMUM ~60 words total across all body lines. Be concise and crisp.
-3. Line 1 MUST be a factual hook that states the news plainly with a concrete number, name, or date.
-4. Lines 2-3 explain why it matters in simple everyday conversational English, written like a real person sharing an honest thought. First-person perspective ("I think", "In my experience") is fine.
-5. Optional 4th line can be a short genuine question or takeaway.
-6. Then put 3 to 5 relevant hashtags on a separate line (e.g. #AI #TechNews #Engineering).
-7. Put the exact article link at the very end on its own line.
-8. ABSOLUTELY BANNED words and clichés (NEVER use any of these):
+1. EXACTLY 3 to 4 short lines of body text written in Urdu script.
+2. Word count between 50 and 125 words total across all body lines.
+3. Line 1 MUST be a strong, curiosity-inducing hook or bold observation that stops the scroll.
+4. Lines 2-3 explain the practical value, real-world impact, or an actionable takeaway from your experience as an AI Trainer & Lecturer.
+5. The final body line MUST be a direct, thought-provoking question that naturally prompts readers to comment (e.g., "آپ کے خیال میں...؟ کمنٹس میں اپنی رائے ضرور بتائیں۔").
+6. Then put 3 to 5 relevant hashtags on a separate line (mix of tech & community tags like #GenerativeAI #Python #TechPakistan #ArtificialIntelligence).
+7. ABSOLUTELY NO EXTERNAL LINKS OR URLS. Never include any web link in the post body (to maximize LinkedIn algorithmic reach).
+8. BANNED words and clichés (NEVER use any of these):
 {', '.join(BANNED_PHRASES)}
-9. NO em-dashes (—). Use regular punctuation (commas, periods).
-10. NO emoji spam. Use at most ONE tasteful emoji, or none at all. NO "🚀🔥💡" combos.
-11. NO bolding (**word**), NO markdown formatting, NO numbered listicles or bullet points.
-12. DO NOT invent facts or stats. Use only the facts present in the news provided.
+9. NO em-dashes (—). Use standard punctuation.
+10. Maximum ONE tasteful emoji across the post, or none at all. NO emoji spam.
+11. NO bolding (**word**), NO markdown formatting, NO numbered listicles.
 
 ---
-GOOD HUMAN-STYLE EXAMPLES:
+GOOD HIGH-ENGAGEMENT EXAMPLES (Urdu):
 
-Example 1:
-Anthropic released updated benchmarks on Tuesday showing a 40% reduction in code generation latency.
-For daily developer workflows, smaller response lags keep you in flow much better than bigger models with long pauses.
-Curious if you value speed or reasoning depth more in your daily coding?
+Example 1 (AI Developer / Productivity):
+کیا AI coding agents واقعی ہمارے روٹین کے backend tasks اور APIs خودکار بنا رہے ہیں؟
+بطور Computer Science Lecturer اور AI Trainer میرا ماننا ہے کہ یہ ٹولز ہمارے دشمن نہیں بلکہ بہترین اسسٹنٹس ہیں جو ڈویلپرز کو لاجک اور سسٹم ڈیزائن پر توجہ دینے کا موقع دیتے ہیں۔ اب مارکیٹ میں محض کوڈر بننے کے بجائے حقیقی مسائل حل کرنے والے Problem Solvers کی قدر ہے۔
+آپ اپنی روزمرہ کوڈنگ میں AI ٹولز کو کتنا استعمال کر رہے ہیں؟ کمنٹس میں ضرور بتائیں۔
 
-#ArtificialIntelligence #Coding #SoftwareEngineering #TechNews
+#AICoding #Python #GenerativeAI #SoftwareEngineering #TechPakistan
 
-https://techcrunch.com/sample-1
+Example 2 (AI Breakthrough / Open Source Models):
+اوپن سورس AI ماڈلز کی کارکردگی اب بڑی ٹیک کمپنیوں کے ملکیتی ماڈلز کے بالکل برابر پہنچ چکی ہے۔
+یہ تبدیلی خاص طور پر پاکستانی فری لانسرز اور اسٹارٹ اپس کے لیے گیم تبدیل کر سکتی ہے کیونکہ اب کم لاگت میں طاقتور AI ایپس بنانا ممکن ہو چکا ہے۔ جو ڈویلپرز ابھی سے Prompt Engineering اور RAG آرکیٹیکچر سیکھ رہے ہیں، مستقبل انہی کا ہے۔
+کیا آپ کے خیال میں مقامی کمپنیاں اپنے ڈیٹا پر اوپن سورس ماڈلز فائن ٹیون کرنے کے لیے تیار ہیں؟
 
-Example 2:
-SpaceX completed the fifth Starship flight on Sunday and caught the booster directly on the launch pad.
-Seeing a 230-foot rocket stage return cleanly turns orbital hardware into rapid turnaround infrastructure.
-It completely changes the cost equation for heavy payload delivery.
+#OpenSourceAI #LLM #GenerativeAI #Python #TechCommunity
 
-#SpaceX #ElonMusk #Aerospace #Engineering
+Example 3 (Students, FYP & Careers):
+یونیورسٹی میں Final Year Project بناتے ہوئے اکثر طلباء اب بھی پرانے روایتی موضوعات منتخب کرتے ہیں۔
+اگر آپ اپنے پروجیکٹ میں Agentic AI یا لوکل LLM انٹیگریشن شامل کر لیں تو انڈسٹری میں جاب حاصل کرنے کے امکانات کئی گنا بڑھ جاتے ہیں۔ کمپنیاں اب رٹا لگانے والوں کے بجائے عملی گٹ ہب پورٹ فولیو رکھنے والے گریجویٹس تلاش کر رہی ہیں۔
+فریش گریجویٹس کے لیے اس وقت سب سے بڑی رکاوٹ کیا ہے، مناسب گائیڈنس یا پریکٹیکل اسکلز؟
 
-https://space.com/sample-2
-
-Example 3:
-Bill Gates committed $1.5 billion through Breakthrough Energy yesterday to co-finance commercial green cement facilities.
-Heavy industry generates huge emissions but usually struggles to attract early private risk capital.
-Targeting industrial emissions directly is where climate funding will make the biggest dent.
-
-#CleanEnergy #BillGates #ClimateTech #Sustainability
-
-https://bloomberg.com/sample-3
+#ComputerScience #FYP #TechCareers #AIStudents #PakistanTech
 ---
 Output ONLY the post text. Do not wrap in quotes or code blocks.
 """
@@ -96,15 +91,14 @@ class PostGenerator:
     def _build_user_prompt(self, story: NewsStory, feedback: Optional[str] = None) -> str:
         """Construct user prompt for LLM."""
         prompt = (
-            f"Here is today's verified news story:\n"
+            f"Here is today's verified tech development:\n"
             f"- Topic: {story.topic_name}\n"
             f"- Headline: {story.title}\n"
             f"- Outlet/Source: {story.source}\n"
             f"- Published: {story.published_at.strftime('%A, %B %d, %Y')}\n"
-            f"- Summary: {story.summary}\n"
-            f"- Article URL: {story.url}\n\n"
-            f"Write a short LinkedIn post following all guidelines. "
-            f"Include the article URL '{story.url}' at the very bottom."
+            f"- Summary: {story.summary}\n\n"
+            f"Write a high-engagement LinkedIn post in Urdu script following all guidelines. "
+            f"Do NOT include any external links or URLs."
         )
 
         if feedback:
@@ -140,15 +134,11 @@ class PostGenerator:
                 logger.error(f"LLM generation failed on attempt {attempt}: {e}")
                 raise
 
-            # Ensure the authentic article URL is cleanly attached at the end
+            # Strip any accidental URL outputted by LLM to ensure maximum organic reach
             draft = raw_draft.strip()
             body_lines, hashtags, existing_link = split_post_components(draft)
-            
-            # If model generated a placeholder URL from few-shot examples, swap it
-            if existing_link and existing_link != story.url:
-                draft = draft.replace(existing_link, story.url)
-            elif not existing_link and story.url:
-                draft = f"{draft}\n\n{story.url}"
+            if existing_link:
+                draft = draft.replace(existing_link, "").strip()
 
             validation = validate_post(draft)
             last_result = validation

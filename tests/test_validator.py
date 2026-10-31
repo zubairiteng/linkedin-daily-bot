@@ -68,16 +68,32 @@ def test_reject_too_many_lines():
 
 
 def test_reject_excessive_words():
-    """Posts exceeding ~60 words must fail."""
+    """Posts exceeding max words (130 words) must fail."""
     content = (
-        "Yesterday in San Francisco, an extremely long and unnecessarily verbose announcement was made by several prominent technology executives regarding recent advancements in artificial intelligence models and distributed GPU compute clusters across global data centers.\n"
-        "This announcement went into tremendous detail about why having massive amounts of memory bandwidth allows developers to train larger models without experiencing significant bottleneck issues during communication phases.\n"
-        "We are closely watching how this trend develops over the coming months and years as hardware prices continue to evolve across the competitive computing industry.\n\n"
+        "Yesterday in San Francisco, an extremely long and unnecessarily verbose announcement was made by several prominent technology executives regarding recent advancements in artificial intelligence models and distributed GPU compute clusters across global enterprise data centers worldwide.\n"
+        "This announcement went into tremendous detail about why having massive amounts of memory bandwidth allows developers to train larger models without experiencing significant bottleneck issues during communication phases and network fabric saturation across multiple servers in high density racks with redundant power supplies and specialized cooling mechanisms.\n"
+        "We are closely watching how this trend develops over the coming months and years as hardware prices continue to evolve across the competitive computing industry with new accelerators entering the market from multiple chip manufacturers worldwide offering different cost performance tradeoffs for hyperscalers and engineering teams building foundation models.\n\n"
         "#AI #Hardware #Tech"
     )
-    result = validate_post(content)
+    result = validate_post(content, max_words=130)
     assert not result.is_valid
     assert any("Word count exceeds limit" in err for err in result.errors)
+
+
+def test_valid_urdu_post():
+    """Valid high-engagement Urdu post with English tech terms and no external links."""
+    content = (
+        "کیا AI coding agents واقعی ہمارے روٹین کے backend tasks اور APIs خودکار بنا رہے ہیں؟\n"
+        "بطور Computer Science Lecturer اور AI Trainer میرا ماننا ہے کہ یہ ٹولز ہمارے دشمن نہیں بلکہ بہترین اسسٹنٹس ہیں جو ڈویلپرز کو لاجک اور سسٹم ڈیزائن پر توجہ دینے کا موقع دیتے ہیں۔ اب مارکیٹ میں محض کوڈر بننے کے بجائے حقیقی مسائل حل کرنے والے Problem Solvers کی قدر ہے۔\n"
+        "آپ اپنی روزمرہ کوڈنگ میں AI ٹولز کو کتنا استعمال کر رہے ہیں؟ کمنٹس میں ضرور بتائیں۔\n\n"
+        "#AICoding #Python #GenerativeAI #SoftwareEngineering #TechPakistan"
+    )
+    result = validate_post(content)
+    assert result.is_valid, f"Expected valid, got errors: {result.errors}"
+    assert result.metrics["body_lines"] == 3
+    assert 50 <= result.metrics["word_count"] <= 130
+    assert result.metrics["hashtag_count"] == 5
+    assert result.metrics["has_link"] is False
 
 
 @pytest.mark.parametrize("banned_word", [

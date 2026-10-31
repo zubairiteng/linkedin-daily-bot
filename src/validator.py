@@ -151,11 +151,11 @@ def split_post_components(content: str):
     return body_lines, hashtags, link
 
 
-def validate_post(content: str, max_words: int = 60) -> ValidationResult:
+def validate_post(content: str, max_words: int = 130) -> ValidationResult:
     """
-    Validate a LinkedIn post string according to strict human-style rules:
-    - Exactly 3 to 4 short lines of body text.
-    - Max ~60 words total in the body text.
+    Validate a LinkedIn post string according to strict high-engagement rules:
+    - Exactly 3 to 5 short lines of body text.
+    - Max ~130 words total in the body text (comfortably fits Urdu sentences with technical English terms).
     - No banned AI buzzwords / clichés.
     - 3 to 5 hashtags on a separate line.
     - No em-dashes (—).

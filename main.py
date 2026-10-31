@@ -10,6 +10,18 @@ import logging
 import sys
 from pathlib import Path
 
+# Ensure UTF-8 output on all platforms (especially Windows PowerShell)
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 from src.config import config, TOPICS
 from src.database import Database
 from src.news_fetcher import NewsFetcher
