@@ -25,29 +25,29 @@ class TopicConfig:
 
 # The four configured high-engagement AI & Tech topics to rotate
 TOPICS: Dict[str, TopicConfig] = {
-    "genai_llm": TopicConfig(
-        id="genai_llm",
-        name="Generative AI & LLMs",
-        rss_query='("Generative AI" OR "Large Language Model" OR LLM OR "prompt engineering" OR "RAG") when:1d',
-        search_keywords="Generative AI LLM OpenAI Anthropic Claude Gemini RAG",
-    ),
     "ai_coding": TopicConfig(
         id="ai_coding",
-        name="AI Coding & Developer Tools",
-        rss_query='("AI coding" OR "Python AI" OR "AI developer" OR "coding assistant" OR "Cursor AI") when:1d',
-        search_keywords="Python AI software engineering coding GitHub Copilot agents",
+        name="AI Coding, Python & Developer Tools",
+        rss_query='("Cursor AI" OR "GitHub Copilot" OR "Python AI" OR "coding assistant" OR "AI coding agent") when:2d',
+        search_keywords="Cursor GitHub Copilot Python AI coding agents developer productivity",
     ),
-    "ai_industry_models": TopicConfig(
-        id="ai_industry_models",
-        name="Latest AI Model Breakthroughs",
-        rss_query='(OpenAI OR "Google Gemini" OR "Anthropic Claude" OR "DeepSeek" OR "Meta AI") when:1d',
-        search_keywords="OpenAI Gemini Claude DeepSeek AI model release benchmark",
+    "genai_career": TopicConfig(
+        id="genai_career",
+        name="AI Skills, Jobs & CS Student FYP",
+        rss_query='("AI jobs" OR "tech hiring" OR "software developer skills" OR "Generative AI roadmap" OR "AI career") when:2d',
+        search_keywords="AI skills tech career software developer jobs students hiring",
     ),
-    "tech_careers_skills": TopicConfig(
-        id="tech_careers_skills",
-        name="AI Skills & Software Engineering Careers",
-        rss_query='("AI skills" OR "future of work" OR "software developer jobs" OR "tech hiring") when:1d',
-        search_keywords="AI skills software jobs tech hiring developer future career",
+    "ai_models": TopicConfig(
+        id="ai_models",
+        name="Top Practical AI Models & Tools",
+        rss_query='("OpenAI" OR "DeepSeek" OR "Claude 3.5" OR "Google Gemini" OR "open source LLM") when:2d',
+        search_keywords="OpenAI DeepSeek Claude Gemini open source AI models developer",
+    ),
+    "ai_agents": TopicConfig(
+        id="ai_agents",
+        name="AI Agents & Automation Workflows",
+        rss_query='("AI automation" OR "AI workflow" OR "AI agents" OR "LangChain" OR "LlamaIndex") when:2d',
+        search_keywords="AI agents LangChain LlamaIndex automation freelance workflow",
     ),
 }
 

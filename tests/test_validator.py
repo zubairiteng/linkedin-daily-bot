@@ -53,15 +53,8 @@ def test_reject_too_few_lines():
 
 
 def test_reject_too_many_lines():
-    """Posts with more than 4 body lines must fail."""
-    content = (
-        "Tesla launched its Robotaxi Cybercab prototype in California.\n"
-        "It lacks steering wheels and pedals entirely.\n"
-        "Elon Musk expects volume production before 2027.\n"
-        "Regulatory clearance will remain the biggest hurdle.\n"
-        "Are you excited to ride in one someday?\n\n"
-        "#Tesla #AutonomousVehicles #Robotics"
-    )
+    """Posts with more than 12 body lines must fail."""
+    content = "\n".join([f"Line number {i} with some content here." for i in range(1, 15)]) + "\n\n#AI #Tech #Code"
     result = validate_post(content)
     assert not result.is_valid
     assert any("Too many body lines" in err for err in result.errors)
@@ -142,12 +135,12 @@ def test_reject_em_dash():
 
 
 def test_reject_emoji_spam():
-    """More than 1 emoji must trigger rejection."""
+    """More than 4 emojis must trigger rejection."""
     content = (
         "xAI activated the 100k H100 Colossus cluster in Memphis this week.\n"
         "Training runs of this scale reduce training epochs by weeks.\n"
         "Excited to see what Grok 3 brings to the table.\n\n"
-        "🚀🔥💡 #xAI #ElonMusk #AI"
+        "🚀🔥💡✨🎉🤖 #xAI #ElonMusk #AI"
     )
     result = validate_post(content)
     assert not result.is_valid
@@ -167,17 +160,18 @@ def test_reject_markdown_formatting():
     assert any("disallowed formatting" in err for err in result.errors)
 
 
-def test_reject_numbered_listicle():
-    """Numbered listicles must be rejected."""
+def test_allow_numbered_listicle():
+    """Actionable numbered listicles with steps are allowed and valid."""
     content = (
-        "1. Anthropic launched Sonnet 3.5 computer use yesterday.\n"
-        "2. The agent can navigate web browsers and desktop tools.\n"
-        "3. This is a very interesting step forward.\n\n"
-        "#AI #Anthropic #Agents"
+        "AI coding tools are transforming how developers work.\n"
+        "1. Write clear prompts with expected inputs.\n"
+        "2. Break big features into small functions.\n"
+        "3. Review generated code carefully.\n"
+        "Which tool do you use daily?\n\n"
+        "#AI #Coding #SoftwareEngineering"
     )
     result = validate_post(content)
-    assert not result.is_valid
-    assert any("Numbered listicle" in err for err in result.errors)
+    assert result.is_valid, f"Expected valid, got: {result.errors}"
 
 
 def test_reject_too_few_or_too_many_hashtags():

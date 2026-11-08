@@ -67,13 +67,11 @@ def count_emojis(text: str) -> int:
             count += 1
     return count
 
-# Markdown indicators (bold, headers, bullet list items)
+# Markdown indicators (disallowed formatting)
 MARKDOWN_PATTERNS = [
     (re.compile(r"\*\*[^*]+\*\*"), "Bold markdown (**text**)"),
     (re.compile(r"__[^_]+__"), "Bold markdown (__text__)"),
     (re.compile(r"^#+\s+", re.MULTILINE), "Markdown header (#)"),
-    (re.compile(r"^\s*[\*\-•]\s+", re.MULTILINE), "Bullet list marker"),
-    (re.compile(r"^\s*\d+[\.\)]\s+", re.MULTILINE), "Numbered listicle"),
     (re.compile(r"`[^`]+`"), "Inline code/backticks"),
 ]
 
@@ -151,16 +149,16 @@ def split_post_components(content: str):
     return body_lines, hashtags, link
 
 
-def validate_post(content: str, max_words: int = 130) -> ValidationResult:
+def validate_post(content: str, max_words: int = 180) -> ValidationResult:
     """
-    Validate a LinkedIn post string according to strict high-engagement rules:
-    - Exactly 3 to 5 short lines of body text.
-    - Max ~130 words total in the body text (comfortably fits Urdu sentences with technical English terms).
+    Validate a LinkedIn post string according to viral high-engagement rules:
+    - 3 to 12 short readable lines / points (allows scannable whitespace and numbered tips).
+    - Max ~180 words total in the body text (fits actionable value, tips, and CTA).
     - No banned AI buzzwords / clichés.
     - 3 to 5 hashtags on a separate line.
     - No em-dashes (—).
-    - Max 1 emoji (or none).
-    - No bold/markdown formatting or numbered listicles.
+    - Max 4 tasteful emojis (or none).
+    - No markdown headers or bold asterisks.
     """
     errors: List[str] = []
     content_clean = content.strip()
@@ -170,14 +168,14 @@ def validate_post(content: str, max_words: int = 130) -> ValidationResult:
 
     body_lines, hashtags, link = split_post_components(content_clean)
 
-    # 1. Line count check: Exactly 3 to 4 short body lines
+    # 1. Line count check: 3 to 12 lines (supports hooks, points, spacing, CTA)
     body_line_count = len(body_lines)
     if body_line_count < 3:
-        errors.append(f"Too few body lines: {body_line_count} (must be exactly 3 to 4 lines).")
-    elif body_line_count > 4:
-        errors.append(f"Too many body lines: {body_line_count} (must be exactly 3 to 4 lines).")
+        errors.append(f"Too few body lines: {body_line_count} (must be between 3 and 12 lines).")
+    elif body_line_count > 12:
+        errors.append(f"Too many body lines: {body_line_count} (must be between 3 and 12 lines).")
 
-    # 2. Word count check: Max ~60 words in body text
+    # 2. Word count check: Max words in body text
     body_text = " ".join(body_lines)
     words = re.findall(r"\b[\w'-]+\b", body_text)
     word_count = len(words)
@@ -208,10 +206,10 @@ def validate_post(content: str, max_words: int = 130) -> ValidationResult:
     if "—" in content_clean or "--" in content_clean:
         errors.append("Em-dash ('—' or '--') detected. Em-dashes are banned.")
 
-    # 6. Emoji count check: Max 1 emoji across post, no spam
+    # 6. Emoji count check: Max 4 emojis across post
     emoji_count = count_emojis(content_clean)
-    if emoji_count > 1:
-        errors.append(f"Emoji spam detected: {emoji_count} emojis found (max 1 emoji or none allowed).")
+    if emoji_count > 4:
+        errors.append(f"Emoji spam detected: {emoji_count} emojis found (max 4 emojis allowed).")
 
     # 7. Markdown / bold / listicle check
     for pattern, desc in MARKDOWN_PATTERNS:
