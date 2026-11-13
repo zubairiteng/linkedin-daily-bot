@@ -48,7 +48,7 @@ class CardContent:
     headline_line2: str      # Headline emphasis line 2 (Yellow)
     subtitle: str            # Introduction (Inter Medium, White)
     points: List[Tuple[str, str, str]]  # list of (number_str, title, description)
-    brand_name: str = "[Zubair Ahmad | AI Trainer]"
+    brand_name: str = "Zubair Ahmad"
 
 
 def _load_font(family: str, weight: str, size: int) -> ImageFont.ImageFont:
@@ -263,7 +263,7 @@ def generate_infographic_card(content: CardContent, output_path: Path) -> Path:
 
     # 7. Footer
     draw.line([(margin_left, 1070), (margin_right, 1070)], fill=COLOR_GOLD, width=5)
-    brand_text = content.brand_name or "[Zubair Ahmad | AI Trainer]"
+    brand_text = content.brand_name or "Zubair Ahmad"
     draw.text((margin_left, 1105), brand_text, fill=COLOR_WHITE, font=f_footer)
 
     save_text = "Save for later"

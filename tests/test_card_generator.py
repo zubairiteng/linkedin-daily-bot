@@ -65,7 +65,7 @@ def test_custom_content_card(tmp_path):
             ("02", "Feed Type Schemas", "Provide interface signatures and data models.\nEliminates hallucinated attributes completely."),
             ("03", "Unit Test Checks", "Treat AI output as an unreviewed pull request.\nAlways verify edge cases with tests.")
         ],
-        brand_name="[Zubair Ahmad | AI Trainer]"
+        brand_name="Zubair Ahmad"
     )
     out_path = tmp_path / "custom_tech_card.png"
     result = generate_infographic_card(content, out_path)

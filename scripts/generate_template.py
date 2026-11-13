@@ -30,7 +30,7 @@ def main():
     parser.add_argument("--h1", type=str, default="YOUR MAIN", help="Headline Line 1 (White)")
     parser.add_argument("--h2", type=str, default="HEADLINE HERE", help="Headline Line 2 (Yellow emphasis)")
     parser.add_argument("--intro", type=str, default="Add a clear, useful introduction here.", help="Introduction sentence")
-    parser.add_argument("--brand", type=str, default="[Zubair Ahmad | AI Trainer]", help="Footer brand name")
+    parser.add_argument("--brand", type=str, default="Zubair Ahmad", help="Footer brand name")
     parser.add_argument("--out", type=str, default="custom_template.png", help="Output PNG path")
     args = parser.parse_args()
 

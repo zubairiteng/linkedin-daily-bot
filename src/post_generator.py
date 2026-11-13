@@ -260,7 +260,7 @@ class PostGenerator:
                         headline_line2=h2,
                         subtitle=sub,
                         points=pts[:3],
-                        brand_name="[Zubair Ahmad | AI Trainer]"
+                        brand_name="Zubair Ahmad"
                     )
         except Exception as e:
             logger.warning(f"Card JSON generation failed ({e}), using robust topic fallback.")
@@ -276,7 +276,7 @@ class PostGenerator:
                 ("02", "Context & Schema First", "Feed database models and type signatures first.\nEliminates hallucinated logic completely."),
                 ("03", "Review & Unit Testing", "Treat AI suggestions as a first draft.\nAlways verify edge cases with unit tests.")
             ],
-            brand_name="[Zubair Ahmad | AI Trainer]"
+            brand_name="Zubair Ahmad"
         )
 
 
