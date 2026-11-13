@@ -85,7 +85,7 @@ jobs:
             python main.py
           fi
 
-      - name: Upload run artifacts (database & logs)
+      - name: Upload run artifacts (database, logs & visual card)
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -93,4 +93,5 @@ jobs:
           path: |
             bot.log
             posted.db
+            generated_card.png
           retention-days: 30

@@ -77,16 +77,133 @@ class LinkedInClient:
     def author_urn(self) -> str:
         return self.token_data["author_urn"]
 
-    def post(self, text: str) -> Dict[str, Any]:
+    def upload_image(self, image_path: Path) -> str:
+        """
+        Upload an image binary to LinkedIn using the v2 Assets API.
+        Returns the registered asset URN (e.g. urn:li:digitalmediaAsset:...).
+        """
+        image_path = Path(image_path)
+        if not image_path.exists():
+            raise FileNotFoundError(f"Image not found at '{image_path}'")
+
+        # 1. Register Upload
+        reg_url = "https://api.linkedin.com/v2/assets?action=registerUpload"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        reg_payload = {
+            "registerUploadRequest": {
+                "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+                "owner": self.author_urn,
+                "supportedUploadMechanism": ["SYNCHRONOUS_UPLOAD"]
+            }
+        }
+
+        logger.info(f"Registering image upload with LinkedIn for: {image_path.name}")
+        reg_res = requests.post(reg_url, headers=headers, json=reg_payload, timeout=20)
+        if reg_res.status_code != 200:
+            raise RuntimeError(f"LinkedIn image registration failed ({reg_res.status_code}): {reg_res.text}")
+
+        data = reg_res.json().get("value", {})
+        asset_urn = data.get("asset")
+        upload_url = data.get("uploadMechanism", {}).get(
+            "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest", {}
+        ).get("uploadUrl")
+
+        if not asset_urn or not upload_url:
+            raise RuntimeError("Missing asset URN or uploadUrl in LinkedIn registration response")
+
+        # 2. Upload binary bytes
+        logger.info(f"Uploading image binary ({image_path.stat().st_size} bytes) to LinkedIn CDN...")
+        with open(image_path, "rb") as f:
+            upload_res = requests.put(
+                upload_url,
+                data=f.read(),
+                headers={"Authorization": f"Bearer {self.access_token}"},
+                timeout=30
+            )
+
+        if upload_res.status_code not in (200, 201):
+            raise RuntimeError(f"LinkedIn image binary upload failed ({upload_res.status_code}): {upload_res.text}")
+
+        logger.info(f"Successfully uploaded image to LinkedIn! Asset URN: {asset_urn}")
+        return asset_urn
+
+    def post(self, text: str, image_path: Optional[Path] = None) -> Dict[str, Any]:
         """
         Publish a post to the authenticated LinkedIn member's personal feed.
-        First attempts the modern REST Posts API (/rest/posts),
-        falling back to UGC Posts (/v2/ugcPosts) if necessary.
+        If image_path is provided, uploads and attaches the visual infographic.
+        Falls back to text post if no image is supplied or if image upload fails.
         """
         # Re-check token validity before attempting post
         self._load_token()
 
-        # 1. Attempt Modern REST Posts API (recommended for Share on LinkedIn)
+        asset_urn = None
+        if image_path:
+            try:
+                asset_urn = self.upload_image(image_path)
+            except Exception as e:
+                logger.warning(f"Failed to upload image ({e}). Falling back to text post...")
+
+        # If we have an uploaded image asset, publish via UGC Posts API with IMAGE category
+        if asset_urn:
+            ugc_url = "https://api.linkedin.com/v2/ugcPosts"
+            ugc_headers = {
+                "Authorization": f"Bearer {self.access_token}",
+                "X-Restli-Protocol-Version": "2.0.0",
+                "Content-Type": "application/json",
+            }
+            ugc_payload = {
+                "author": self.author_urn,
+                "lifecycleState": "PUBLISHED",
+                "specificContent": {
+                    "com.linkedin.ugc.ShareContent": {
+                        "shareCommentary": {
+                            "text": text
+                        },
+                        "shareMediaCategory": "IMAGE",
+                        "media": [
+                            {
+                                "status": "READY",
+                                "description": {
+                                    "text": "Tech Infographic & Roadmap"
+                                },
+                                "media": asset_urn,
+                                "title": {
+                                    "text": "Practical AI Guide"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "visibility": {
+                    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+                }
+            }
+
+            logger.info("Posting visual content via LinkedIn UGC Posts API...")
+            res = requests.post(ugc_url, headers=ugc_headers, json=ugc_payload, timeout=20)
+            if res.status_code in (200, 201):
+                data = res.json() if res.text else {}
+                post_urn = data.get("id", "urn:li:ugcPost:unknown")
+                logger.info(f"Successfully posted visual card to LinkedIn! Post URN: {post_urn}")
+                return {
+                    "success": True,
+                    "method": "ugc_posts_image",
+                    "post_urn": post_urn,
+                    "status_code": res.status_code,
+                    "asset_urn": asset_urn,
+                }
+            elif res.status_code == 401:
+                raise LinkedInAuthError(
+                    "LinkedIn returned 401 Unauthorized. Access token is invalid or has been revoked. "
+                    "Please run 'python auth.py' to re-authenticate."
+                )
+            else:
+                logger.warning(f"Image post failed ({res.status_code}): {res.text}. Trying text fallback...")
+
+        # Text-only post fallback (REST Posts API -> UGC Posts API)
         rest_url = "https://api.linkedin.com/rest/posts"
         rest_headers = {
             "Authorization": f"Bearer {self.access_token}",

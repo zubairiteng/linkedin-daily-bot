@@ -30,3 +30,6 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+generated_card.png
+.DS_Store
+Thumbs.db

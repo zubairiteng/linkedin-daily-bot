@@ -197,6 +197,77 @@ class PostGenerator:
         logger.error(f"Failed to generate valid post after {self.max_retries} attempts.")
         return last_draft, last_result
 
+    def generate_card_content(self, story: NewsStory, post_text: str):
+        """
+        Generate structured English content for the 1080x1350 visual tech infographic card.
+        Uses LLM to summarize the key rules and falls back reliably if parsing fails.
+        """
+        import json
+        import re
+        from .card_generator import CardContent
+
+        card_prompt = (
+            f"Based on this tech topic:\n"
+            f"- Topic: {story.topic_name}\n"
+            f"- Title: {story.title}\n"
+            f"- Context: {story.summary}\n\n"
+            f"Create structured data for a 1080x1350px dark-mode tech infographic card in English.\n"
+            f"Output strictly valid JSON with this exact schema:\n"
+            f"{{\n"
+            f'  "badge": "⚡ AI DEVELOPER CHEAT SHEET",\n'
+            f'  "headline_line1": "3 Key Practical Rules",\n'
+            f'  "headline_line2": "Every Developer Must Know",\n'
+            f'  "subtitle": "Essential practices to write cleaner code and eliminate bugs.",\n'
+            f'  "points": [\n'
+            f'    ["01", "Short Point 1 Title", "Actionable practical explanation (10 to 18 words)."],\n'
+            f'    ["02", "Short Point 2 Title", "Actionable practical explanation (10 to 18 words)."],\n'
+            f'    ["03", "Short Point 3 Title", "Actionable practical explanation (10 to 18 words)."]\n'
+            f'  ]\n'
+            f"}}"
+        )
+
+        try:
+            raw = self.llm.generate(
+                system_prompt="You are a graphic designer and technical writer. Output ONLY a valid JSON object matching the requested schema.",
+                user_prompt=card_prompt,
+                temperature=0.3
+            )
+            match = re.search(r"\{.*\}", raw, re.DOTALL)
+            if match:
+                data = json.loads(match.group(0))
+                badge = data.get("badge", "⚡ AI DEVELOPER GUIDE")
+                h1 = data.get("headline_line1", "3 Essential Rules")
+                h2 = data.get("headline_line2", "For Modern AI Development")
+                sub = data.get("subtitle", "Save this checklist for your next project.")
+                pts = [
+                    (str(p[0]), str(p[1]), str(p[2]))
+                    for p in data.get("points", [])
+                    if len(p) >= 3
+                ]
+                if len(pts) >= 3:
+                    return CardContent(
+                        badge=badge,
+                        headline_line1=h1,
+                        headline_line2=h2,
+                        subtitle=sub,
+                        points=pts[:3]
+                    )
+        except Exception as e:
+            logger.warning(f"Card JSON generation failed ({e}), using robust topic fallback.")
+
+        # Reliable default fallback
+        return CardContent(
+            badge="⚡ PRACTICAL AI ROADMAP 2026",
+            headline_line1="3 Core AI Rules",
+            headline_line2="Every Developer Should Follow",
+            subtitle="Essential practices to write clean code, avoid bugs, and build faster.",
+            points=[
+                ("01", "Modular Prompting", "Never ask AI to build an entire feature at once. Break tasks into modular functions."),
+                ("02", "Context & Schema First", "Always feed database models, types, and API signatures before generating backend logic."),
+                ("03", "Review & Unit Testing", "Treat AI code as a draft. Always verify edge cases, security, and dependencies.")
+            ]
+        )
+
 
 def create_gemini_generator(
     api_key: Optional[str] = None,

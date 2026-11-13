@@ -194,9 +194,20 @@ def run_bot(
     print("=" * 65)
     print(f"Validation: {validation.summary()}\n")
 
+    # 3.5 Generate High-Contrast Visual Infographic Card
+    card_path = config.root_dir / "generated_card.png"
+    try:
+        from src.card_generator import generate_infographic_card
+        card_content = generator.generate_card_content(story, post_content)
+        generate_infographic_card(card_content, card_path)
+        logger.info(f"Visual tech infographic card ready at: {card_path}")
+    except Exception as e:
+        logger.warning(f"Could not generate visual card ({e}). Falling back to text.")
+        card_path = None
+
     # 4. Handle Dry-Run Mode
     if dry_run:
-        logger.info("Dry run completed successfully. No posts published or sent to Telegram.")
+        logger.info(f"Dry run completed successfully. Visual card saved to: {card_path}")
         return 0
 
     # Determine posting mode
@@ -220,10 +231,11 @@ def run_bot(
             return 0
         logger.info("Approval confirmed. Proceeding to publish to LinkedIn.")
 
-    # 6. Publish to LinkedIn
+    # 6. Publish to LinkedIn with Visual Infographic
     try:
         linkedin = LinkedInClient(config)
-        result = linkedin.post(post_content)
+        img_to_post = card_path if (card_path and card_path.exists()) else None
+        result = linkedin.post(post_content, image_path=img_to_post)
         post_urn = result.get("post_urn", "published")
 
         # 7. Record post in database for deduplication and topic rotation
