@@ -199,7 +199,7 @@ class PostGenerator:
 
     def generate_card_content(self, story: NewsStory, post_text: str):
         """
-        Generate structured English content for the 1080x1350 visual tech infographic card.
+        Generate structured English content for the 1200x1200 visual tech infographic card.
         Uses LLM to summarize the key rules and falls back reliably if parsing fails.
         """
         import json
@@ -211,34 +211,43 @@ class PostGenerator:
             f"- Topic: {story.topic_name}\n"
             f"- Title: {story.title}\n"
             f"- Context: {story.summary}\n\n"
-            f"Create structured data for a 1080x1350px dark-mode tech infographic card in English.\n"
+            f"Create structured data for a 1200x1200px square royal blue tech infographic card in English.\n"
+            f"Style rules:\n"
+            f"- badge: Topic/Category in 2 to 4 uppercase words (e.g. 'AI CODING TOOLS', 'AGENTIC WORKFLOWS')\n"
+            f"- headline_line1: 2 to 4 punchy uppercase words (white text)\n"
+            f"- headline_line2: 2 to 4 punchy uppercase words (yellow accent emphasis)\n"
+            f"- subtitle: A clear, useful 1-sentence introduction (10 to 16 words max)\n"
+            f"- points: exactly 3 actionable steps with [number, step_title, step_description]\n"
+            f"  * number: '01', '02', '03'\n"
+            f"  * step_title: 2 to 4 bold words\n"
+            f"  * step_description: 2 short lines (10 to 18 words total)\n\n"
             f"Output strictly valid JSON with this exact schema:\n"
             f"{{\n"
-            f'  "badge": "⚡ AI DEVELOPER CHEAT SHEET",\n'
-            f'  "headline_line1": "3 Key Practical Rules",\n'
-            f'  "headline_line2": "Every Developer Must Know",\n'
+            f'  "badge": "AI CODING TOOLS",\n'
+            f'  "headline_line1": "MASTER CURSOR &",\n'
+            f'  "headline_line2": "AI CODING TODAY",\n'
             f'  "subtitle": "Essential practices to write cleaner code and eliminate bugs.",\n'
             f'  "points": [\n'
-            f'    ["01", "Short Point 1 Title", "Actionable practical explanation (10 to 18 words)."],\n'
-            f'    ["02", "Short Point 2 Title", "Actionable practical explanation (10 to 18 words)."],\n'
-            f'    ["03", "Short Point 3 Title", "Actionable practical explanation (10 to 18 words)."]\n'
+            f'    ["01", "Modular Prompting", "Break large tasks into single functions.\\nNever ask AI to build everything at once."],\n'
+            f'    ["02", "Feed Type Definitions", "Always provide interfaces and data schemas.\\nEliminate hallucinated properties early."],\n'
+            f'    ["03", "Rigorous Verification", "Treat AI code as an unverified PR.\\nAlways run unit tests before merging."]\n'
             f'  ]\n'
             f"}}"
         )
 
         try:
             raw = self.llm.generate(
-                system_prompt="You are a graphic designer and technical writer. Output ONLY a valid JSON object matching the requested schema.",
+                system_prompt="You are a senior graphic designer and technical writer. Output ONLY a valid JSON object matching the requested schema.",
                 user_prompt=card_prompt,
                 temperature=0.3
             )
             match = re.search(r"\{.*\}", raw, re.DOTALL)
             if match:
                 data = json.loads(match.group(0))
-                badge = data.get("badge", "⚡ AI DEVELOPER GUIDE")
-                h1 = data.get("headline_line1", "3 Essential Rules")
-                h2 = data.get("headline_line2", "For Modern AI Development")
-                sub = data.get("subtitle", "Save this checklist for your next project.")
+                badge = data.get("badge", "PRACTICAL AI GUIDE")
+                h1 = data.get("headline_line1", "3 ESSENTIAL RULES")
+                h2 = data.get("headline_line2", "FOR MODERN DEVELOPERS")
+                sub = data.get("subtitle", "Essential practices to write clean code and build faster.")
                 pts = [
                     (str(p[0]), str(p[1]), str(p[2]))
                     for p in data.get("points", [])
@@ -250,22 +259,24 @@ class PostGenerator:
                         headline_line1=h1,
                         headline_line2=h2,
                         subtitle=sub,
-                        points=pts[:3]
+                        points=pts[:3],
+                        brand_name="[Zubair Ahmad | AI Trainer]"
                     )
         except Exception as e:
             logger.warning(f"Card JSON generation failed ({e}), using robust topic fallback.")
 
         # Reliable default fallback
         return CardContent(
-            badge="⚡ PRACTICAL AI ROADMAP 2026",
-            headline_line1="3 Core AI Rules",
-            headline_line2="Every Developer Should Follow",
+            badge="AI DEVELOPER ROADMAP",
+            headline_line1="3 CORE AI RULES",
+            headline_line2="FOR 2026 DEVELOPERS",
             subtitle="Essential practices to write clean code, avoid bugs, and build faster.",
             points=[
-                ("01", "Modular Prompting", "Never ask AI to build an entire feature at once. Break tasks into modular functions."),
-                ("02", "Context & Schema First", "Always feed database models, types, and API signatures before generating backend logic."),
-                ("03", "Review & Unit Testing", "Treat AI code as a draft. Always verify edge cases, security, and dependencies.")
-            ]
+                ("01", "Modular Prompting", "Never ask AI to build an entire feature at once.\nBreak tasks into small modular functions."),
+                ("02", "Context & Schema First", "Feed database models and type signatures first.\nEliminates hallucinated logic completely."),
+                ("03", "Review & Unit Testing", "Treat AI suggestions as a first draft.\nAlways verify edge cases with unit tests.")
+            ],
+            brand_name="[Zubair Ahmad | AI Trainer]"
         )
 
 
