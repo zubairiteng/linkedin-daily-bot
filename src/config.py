@@ -23,31 +23,31 @@ class TopicConfig:
     search_keywords: str
 
 
-# The four configured high-engagement AI & Tech topics to rotate
+# The four configured high-engagement developer & AI topics to rotate
 TOPICS: Dict[str, TopicConfig] = {
     "ai_coding": TopicConfig(
         id="ai_coding",
         name="AI Coding, Python & Developer Tools",
-        rss_query='("Cursor AI" OR "GitHub Copilot" OR "Python AI" OR "coding assistant" OR "AI coding agent") when:2d',
+        rss_query='("Cursor AI" OR "GitHub Copilot" OR "Python AI" OR "Claude 3.5" OR "coding assistant" OR "AI coding agent") -stocks -revenue when:3d',
         search_keywords="Cursor GitHub Copilot Python AI coding agents developer productivity",
     ),
     "genai_career": TopicConfig(
         id="genai_career",
-        name="AI Skills, Jobs & CS Student FYP",
-        rss_query='("AI jobs" OR "tech hiring" OR "software developer skills" OR "Generative AI roadmap" OR "AI career") when:2d',
-        search_keywords="AI skills tech career software developer jobs students hiring",
+        name="AI Skills, Careers & Developer Roadmaps",
+        rss_query='("AI engineer roadmap" OR "software developer skills" OR "AI jobs" OR "tech hiring" OR "Python career") -investing -stocks when:3d',
+        search_keywords="AI skills tech career software developer jobs hiring roadmap",
     ),
     "ai_models": TopicConfig(
         id="ai_models",
-        name="Top Practical AI Models & Tools",
-        rss_query='("OpenAI" OR "DeepSeek" OR "Claude 3.5" OR "Google Gemini" OR "open source LLM") when:2d',
-        search_keywords="OpenAI DeepSeek Claude Gemini open source AI models developer",
+        name="Top Practical AI Models & Open Source",
+        rss_query='("DeepSeek" OR "OpenAI" OR "Claude" OR "Ollama" OR "open source LLM" OR "Hugging Face") -stocks -shares -earnings when:3d',
+        search_keywords="DeepSeek OpenAI Claude Ollama open source AI models developer",
     ),
     "ai_agents": TopicConfig(
         id="ai_agents",
         name="AI Agents & Automation Workflows",
-        rss_query='("AI automation" OR "AI workflow" OR "AI agents" OR "LangChain" OR "LlamaIndex") when:2d',
-        search_keywords="AI agents LangChain LlamaIndex automation freelance workflow",
+        rss_query='("AI agents" OR "LangChain" OR "LlamaIndex" OR "CrewAI" OR "AutoGen" OR "agentic workflow") -revenue -earnings -accounting when:3d',
+        search_keywords="AI agents LangChain LlamaIndex CrewAI AutoGen developer workflow",
     ),
 }
 

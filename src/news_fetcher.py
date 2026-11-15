@@ -64,6 +64,67 @@ def strip_html(raw_html: str) -> str:
     return " ".join(text.split())
 
 
+# Banned corporate PR, accounting, and stock-pumping sources
+BANNED_SOURCES = [
+    "cpa practice advisor", "pr newswire", "globenewswire", "business wire",
+    "marketwatch", "the motley fool", "investing.com", "zacks", "stocknews",
+    "benzinga", "seeking alpha", "investorplace", "tipranks"
+]
+
+# Banned corporate finance keywords in headlines
+BANNED_TITLE_KEYWORDS = [
+    r"\brevenue\b", r"\bearnings\b", r"\bstocks?\b", r"\bquarterly\b",
+    r"\bshareholders?\b", r"\bipo\b", r"\bacquisition\b", r"\bsecurities\b",
+    r"\bcpa\b", r"\baccounting\b", r"\bdividend\b", r"\bq[1-4]\b",
+    r"\bnasdaq\b", r"\bnyse\b", r"\bshares\b", r"\bprice target\b",
+    r"\bfiscal\b", r"\bfinancial results\b"
+]
+
+# High-relevance developer keywords that boost engagement score
+DEVELOPER_BOOST_KEYWORDS = [
+    "cursor", "copilot", "python", "github", "open source", "deepseek",
+    "ollama", "hugging face", "developer", "developers", "coding",
+    "prompt engineering", "agent", "agents", "workflow", "workflows",
+    "rag", "framework", "roadmap", "architecture", "benchmark", "llm",
+    "claude", "gemini", "chatgpt", "openai"
+]
+
+
+def is_corporate_or_financial_pr(title: str, source: str) -> bool:
+    """Check if an article is dry corporate financial PR or accounting noise."""
+    source_lower = source.lower()
+    if any(banned in source_lower for banned in BANNED_SOURCES):
+        return True
+
+    title_lower = title.lower()
+    for pattern in BANNED_TITLE_KEYWORDS:
+        if re.search(pattern, title_lower):
+            return True
+
+    return False
+
+
+def calculate_developer_relevance(title: str, summary: str, source: str, published_at: datetime) -> float:
+    """Score article based on freshness, publication quality, and practical developer relevance."""
+    now_utc = datetime.now(timezone.utc)
+    hours_old = max(0.1, (now_utc - published_at).total_seconds() / 3600)
+    freshness_factor = 1.0 / (1.0 + (hours_old / 6.0))
+
+    # Tier-1 reputable tech outlets
+    reputable_domains = [
+        "techcrunch", "the verge", "wired", "ars technica", "mit technology review",
+        "venturebeat", "github", "hugging face", "reuters", "bloomberg"
+    ]
+    source_bonus = 1.4 if any(d in source.lower() for d in reputable_domains) else 1.0
+
+    # Developer keyword relevance boost
+    combined_text = (title + " " + summary).lower()
+    kw_matches = sum(1 for kw in DEVELOPER_BOOST_KEYWORDS if kw in combined_text)
+    dev_boost = 1.0 + min(2.0, kw_matches * 0.35)
+
+    return round(freshness_factor * source_bonus * dev_boost * 10, 2)
+
+
 class NewsFetcher:
     """Fetches, deduplicates, and ranks news articles."""
 
@@ -121,17 +182,12 @@ class NewsFetcher:
                 if not title or not url:
                     continue
 
-                # Calculate basic importance score
-                hours_old = max(0.1, (now_utc - published_at).total_seconds() / 3600)
-                freshness_factor = 1.0 / (1.0 + (hours_old / 6.0))  # higher if more recent
-                
-                # Check for major tier-1 tech publications
-                reputable_domains = [
-                    "reuters", "bloomberg", "wsj", "techcrunch", "theverge",
-                    "wired", "cnbc", "ft.com", "ars technica", "nature", "mit technology review"
-                ]
-                source_bonus = 1.3 if any(d in source.lower() for d in reputable_domains) else 1.0
-                importance_score = round(freshness_factor * source_bonus * 10, 2)
+                # Discard corporate financial PR and accounting noise
+                if is_corporate_or_financial_pr(title, source):
+                    logger.debug(f"Discarding corporate/financial PR story: {title} ({source})")
+                    continue
+
+                importance_score = calculate_developer_relevance(title, summary, source, published_at)
 
                 stories.append(NewsStory(
                     topic_id=topic.id,
